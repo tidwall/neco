@@ -1,0 +1,16 @@
+.DS_Store
+*.dSYM
+a.out
+.vscode/
+*.o
+tmp.*
+*.out.js
+*.out.wasm
+*.c.wasm
+*.c.test
+*.c.worker.js
+*.profraw
+*.profdata
+*.testdata
+*.sqlite3
+*.db
