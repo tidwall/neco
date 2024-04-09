@@ -25,6 +25,7 @@ easy.
 [signals](docs/API.md#signals), [random data](docs/API.md#random-number-generator), [streams](docs/API.md#streams-and-buffered-io), and [buffered I/O](docs/API.md#streams-and-buffered-io).
 - Lightweight runtime with a fair and deterministic [scheduler](#the-scheduler).
 - [Fast](#fast-context-switching) user-space context switching. Uses assembly in most cases.
+- Stackful coroutines that are nestable, with their life times fully managed by the scheduler.
 - Cross-platform. Linux, Mac, FreeBSD. _(Also WebAssembly and Windows with [some limitations](#platform-notes))_.
 - Single file amalgamation. No dependencies.
 - [Test suite](tests/README.md) with 100% coverage using sanitizers and [Valgrind](https://valgrind.org).
