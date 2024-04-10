@@ -2739,10 +2739,10 @@ static void *worker_entry(void *arg) {
         ts.tv_sec += 1;
         pthread_cond_timedwait(&thread->cond, &thread->mu, &ts);
         if (thread->len == 0) {
-            thread->th = 0;
             if (!thread->end) {
                 pthread_detach(thread->th);
             }
+            thread->th = 0;
             thread->end = false;
             break;
         }
