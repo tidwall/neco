@@ -15,7 +15,7 @@ void co_work_runner(int argc, void *argv[]) {
 
 void co_work(int argc, void *argv[]) {
     (void)argc; (void)argv;
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10000; i++) {
         expect(neco_start(co_work_runner, 1, &i), NECO_OK);
     }
 }
