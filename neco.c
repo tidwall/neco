@@ -7749,11 +7749,13 @@ static int _pipe_(int pipefd[2]) {
     char path[PATH_MAX];
     snprintf(path, sizeof(path), "/tmp/neco.%" PRIu64 ".sock", tmpkey);
     int ln = neco_serve("unix", path);
+    int64_t childid = 0;
     if (ln > 0) {
         // State a coroutine to connect to the listener.
         int nret = neco_start(co_pipe, 3, path, &secret, &fd0);
         neco_errconv_to_sys(nret);
         if (nret == NECO_OK) {
+            childid = neco_lastid();
             int64_t dl = neco_now() + NECO_SECOND * 5;
             fd1 = neco_accept_dl(ln, 0, 0, dl);
             neco_errconv_to_sys(fd1);
@@ -7773,8 +7775,8 @@ static int _pipe_(int pipefd[2]) {
         unlink(path);
     }
     int perrno = errno;
-    neco_yield();
     if (ret == 0) {
+        neco_join(childid);
         pipefd[0] = fd0;
         pipefd[1] = fd1;
         fd0 = -1;
