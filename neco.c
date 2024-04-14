@@ -2831,8 +2831,10 @@ bool worker_submit(struct worker *worker, int64_t pin, void(*work)(void *udata),
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <dlfcn.h>
+#include <sys/syscall.h>
 #endif
 #include <pthread.h>
+
 
 #include "neco.h"
 
@@ -3657,9 +3659,8 @@ static int is_main_thread(void) {
     return IsGUIThread(false);
 }
 #elif defined(__linux__) || defined(__EMSCRIPTEN__) 
-int gettid(void);
 static int is_main_thread(void) {
-    return getpid() == gettid();
+    return getpid() == (pid_t)syscall(SYS_gettid);
 }
 #else
 int pthread_main_np(void);
