@@ -424,6 +424,7 @@ ssize_t neco_stream_buffered_write_size(neco_stream *stream);
 #define neco_main \
 static inline __neco_main0(int argc, char *argv[]); \
 static void _neco_main(int argc, void *argv[]) { \
+    (void)argc; \
     __neco_exit_prog(__neco_main0(*(int*)argv[0], *(char***)argv[1])); \
 } \
 int main(int argc, char *argv[]) { \
