@@ -21,7 +21,7 @@ easy.
 - [Synchronization](docs/API.md#channels): channels, generators, mutexes, condition variables, and waitgroups.
 - Support for [deadlines and cancelation](docs/API.md#deadlines-and-cancelation).
 - [Posix friendly](docs/API.md#posix-wrappers) interface using file descriptors.
-- Addtional APIs for [networking](docs/API.md#networking-utilities),
+- Additional APIs for [networking](docs/API.md#networking-utilities),
 [signals](docs/API.md#signals), [random data](docs/API.md#random-number-generator), [streams](docs/API.md#streams-and-buffered-io), and [buffered I/O](docs/API.md#streams-and-buffered-io).
 - Lightweight runtime with a fair and deterministic [scheduler](#the-scheduler).
 - [Fast](#fast-context-switching) user-space context switching. Uses assembly in most cases.
