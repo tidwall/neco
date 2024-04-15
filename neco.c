@@ -30,7 +30,9 @@ NECO_USEHEAPSTACK     // Allocate stacks on the heap using malloc
 NECO_NOSIGNALS        // Disable signal handling
 NECO_NOWORKERS        // Disable all worker threads, work will run in coroutine
 NECO_USEREADWORKERS   // Use read workers, disabled by default
-NECO_NOWRITEWORKERS   // Disable write workers
+NECO_USEWRITEWORKERS  // Use write workers, enabled by default on Linux
+NECO_NOREADWORKERS    // Disable all read workers
+NECO_NOWRITEWORKERS   // Disable all write workers
 */
 
 // Windows and Webassembly have limited features.
@@ -54,6 +56,12 @@ NECO_NOWRITEWORKERS   // Disable write workers
 #define DEF_MAXWORKERS    64
 #define DEF_MAXRINGSIZE   32
 #define DEF_MAXIOWORKERS  2
+#endif
+
+#ifdef __linux__
+#ifndef NECO_USEWRITEWORKERS
+#define NECO_USEWRITEWORKERS
+#endif
 #endif
 
 #ifndef NECO_STACKSIZE
@@ -90,6 +98,7 @@ NECO_NOWRITEWORKERS   // Disable write workers
 #define NECO_BURST 1
 #endif
 #endif
+
 
 // The following is only needed when LLCO_NOASM or LLCO_STACKJMP is defined.
 // This same block is duplicated in the llco.c block below.
@@ -4988,7 +4997,8 @@ static void cowait(int fd, enum evkind kind, int64_t deadline) {
 // Networking code
 ////////////////////////////////////////////////////////////////////////////////
 
-#if !defined(NECO_NOWORKERS) && defined(NECO_USEREADWORKERS)
+#if !defined(NECO_NOWORKERS) && defined(NECO_USEREADWORKERS) && \
+    !defined(NECO_NOREADWORKERS)
 
 struct ioread {
     int fd;
@@ -5150,7 +5160,8 @@ static ssize_t write1(int fd, const void *data, size_t nbytes) {
 #define write2 write1
 #endif
 
-#if !defined(NECO_NOWORKERS) && !defined(NECO_NOWRITEWORKERS)
+#if !defined(NECO_NOWORKERS) && defined(NECO_USEWRITEWORKERS) && \
+    !defined(NECO_NOWRITEWORKERS)
 struct iowrite {
     int fd;
     const void *data;
