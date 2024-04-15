@@ -29,6 +29,8 @@ NECO_NOPOOL           // Do not use a coroutine and channel pools
 NECO_USEHEAPSTACK     // Allocate stacks on the heap using malloc
 NECO_NOSIGNALS        // Disable signal handling
 NECO_NOWORKERS        // Disable all worker threads, work will run in coroutine
+NECO_USEREADWORKERS   // Use read workers, disabled by default
+NECO_NOWRITEWORKERS   // Disable write workers
 */
 
 // Windows and Webassembly have limited features.
@@ -4986,7 +4988,7 @@ static void cowait(int fd, enum evkind kind, int64_t deadline) {
 // Networking code
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef NECO_NOWORKERS
+#if !defined(NECO_NOWORKERS) && defined(NECO_USEREADWORKERS)
 
 struct ioread {
     int fd;
@@ -5010,7 +5012,7 @@ static void ioread(void *udata) {
 
 static ssize_t read1(int fd, void *data, size_t nbytes) {
     ssize_t n;
-    bool nowork = false;
+    bool nowork = true;
 #ifdef NECO_TESTING
     if (neco_fail_read_counter > 0) {
         nowork = true;
@@ -5148,7 +5150,7 @@ static ssize_t write1(int fd, const void *data, size_t nbytes) {
 #define write2 write1
 #endif
 
-#ifndef NECO_NOWORKERS
+#if !defined(NECO_NOWORKERS) && !defined(NECO_NOWRITEWORKERS)
 struct iowrite {
     int fd;
     const void *data;
