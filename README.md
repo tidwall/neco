@@ -169,7 +169,7 @@ int neco_main(int argc, char *argv[]) {
     *arg1 = 1;
 
     neco_start(coroutine, 5, &arg0, arg1, &(int){2}, NULL, "hello world");
-    free(arg2);
+    free(arg1);
 
     neco_sleep(NECO_SECOND);
     printf("first done\n");
