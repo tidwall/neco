@@ -1,2 +1,4 @@
-import github.com/tidwall/sco v0.1.0
-import github.com/tidwall/stack v0.1.0
+import github.com/tidwall/sco v0.1.1
+
+sum ad1e36373245380b0f5588c11f1a69369171436a  sco.c
+sum 92baa4119d14dbb2b1effcd2eaeb4adcba8befc1  sco.h

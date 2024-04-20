@@ -1328,7 +1328,8 @@ struct llco_dlinfo {
     void            *dli_saddr;     /* Address of nearest symbol */
 };
 
-#ifdef __linux__
+
+#if defined(__linux__) && !defined(_GNU_SOURCE) 
 int dladdr(const void *, void *);
 #endif
 
