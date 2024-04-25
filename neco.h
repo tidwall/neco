@@ -422,10 +422,10 @@ ssize_t neco_stream_buffered_write_size(neco_stream *stream);
 #include <stdlib.h>
 
 #define neco_main \
-static inline __neco_main0(int argc, char *argv[]); \
+__neco_main(int argc, char *argv[]); \
 static void _neco_main(int argc, void *argv[]) { \
     (void)argc; \
-    __neco_exit_prog(__neco_main0(*(int*)argv[0], *(char***)argv[1])); \
+    __neco_exit_prog(__neco_main(*(int*)argv[0], *(char***)argv[1])); \
 } \
 int main(int argc, char *argv[]) { \
     neco_env_setpaniconerror(true); \
@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) { \
     fprintf(stderr, "neco_start: %s (code %d)\n", neco_strerror(ret), ret); \
     return -1; \
 }; \
-int static inline __neco_main0
+int __neco_main
 
 ////////////////////////////////////////////////////////////////////////////////
 // private functions, not to be call directly
