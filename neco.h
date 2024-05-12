@@ -106,7 +106,7 @@ int neco_gen_close(neco_gen *gen);
 /// to a variable or set of variables and helps to avoid data inconsistencies
 /// due to race conditions.
 /// @{
-typedef struct { char _[48]; } neco_mutex;
+typedef struct { _Alignas(16) char _[48]; } neco_mutex;
 
 #define NECO_MUTEX_INITIALIZER { 0 }
 
@@ -128,7 +128,7 @@ int neco_mutex_tryrdlock(neco_mutex *mutex);
 /// At the same time, neco_waitgroup_wait() can be used to block until all
 /// coroutines are completed.
 /// @{
-typedef struct { char _[48]; } neco_waitgroup;
+typedef struct { _Alignas(16) char _[48]; } neco_waitgroup;
 
 #define NECO_WAITGROUP_INITIALIZER { 0 }
 
@@ -143,7 +143,7 @@ int neco_waitgroup_wait_dl(neco_waitgroup *waitgroup, int64_t deadline);
 /// A condition variable is a synchronization mechanism that allows coroutines
 /// to suspend execution until some condition is true. 
 /// @{
-typedef struct { char _[48]; } neco_cond;
+typedef struct { _Alignas(16) char _[48]; } neco_cond;
 #define NECO_COND_INITIALIZER { 0 }
 
 int neco_cond_init(neco_cond *cond);

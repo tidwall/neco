@@ -7063,6 +7063,7 @@ struct neco_mutex {
 
 
 static_assert(sizeof(neco_mutex) >= sizeof(struct neco_mutex), "");
+static_assert(_Alignof(neco_mutex) == _Alignof(struct neco_mutex), "");
 
 static int mutex_init(neco_mutex *mutex) {
     struct neco_mutex *mu = (void*)mutex;
@@ -7319,6 +7320,7 @@ struct neco_waitgroup {
 };
 
 static_assert(sizeof(neco_waitgroup) >= sizeof(struct neco_waitgroup), "");
+static_assert(_Alignof(neco_waitgroup) == _Alignof(struct neco_waitgroup), "");
 
 inline
 static int check_waitgroup(struct neco_waitgroup *wg) {
@@ -7466,6 +7468,7 @@ struct neco_cond {
 };
 
 static_assert(sizeof(neco_cond) >= sizeof(struct neco_cond), "");
+static_assert(_Alignof(neco_cond) == _Alignof(struct neco_cond), "");
 
 static int cond_init0(struct neco_cond *cv) {
     memset(cv, 0, sizeof(struct neco_cond));
