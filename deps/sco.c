@@ -1807,6 +1807,14 @@ static struct sco *sco_list_pop_front(struct sco_list *list) {
     return co;
 }
 
+static void sco_list_push_front(struct sco_list *list, struct sco *co) {
+    sco_remove_from_list(co);
+    list->head.next->prev = co;
+    co->next = list->head.next;
+    co->prev = (struct sco*)&list->head;
+    list->head.next = co;
+}
+
 static void sco_list_push_back(struct sco_list *list, struct sco *co) {
     sco_remove_from_list(co);
     list->tail.prev->next = co;
@@ -1854,11 +1862,18 @@ static void sco_entry(void *udata) {
     co->prev = co;
     co->next = co;
     if (sco_cur) {
+#ifdef SCO_QUICKSTART
+        // Add the coroutine that started this one to the front of the runners
+        // list, and then continue to run new coroutine immediately.
+        sco_list_push_front(&sco_runners, sco_cur);
+        sco_nrunners++;
+#else
         // Reschedule the coroutine that started this one
         sco_list_push_back(&sco_yielders, co);
         sco_list_push_back(&sco_yielders, sco_cur);
         sco_nyielders += 2;
         sco_switch(false, false);
+#endif
     }
     sco_cur = co;
     if (sco_user_entry) {
@@ -1928,7 +1943,7 @@ void sco_resume(int64_t id) {
             co->next = co;
             sco_list_push_back(&sco_yielders, co);
             sco_nyielders++;
-            sco_yield();
+            // sco_yield();
         }
     }
 }
