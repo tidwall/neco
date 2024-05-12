@@ -3670,9 +3670,14 @@ static struct coroutine *evexists(int fd, enum evkind kind) {
 static int is_main_thread(void) {
     return IsGUIThread(false);
 }
-#elif defined(__linux__) || defined(__EMSCRIPTEN__) 
+#elif defined(__linux__)
 static int is_main_thread(void) {
     return getpid() == (pid_t)syscall(SYS_gettid);
+}
+#elif defined(__EMSCRIPTEN__) 
+int gettid(void);
+static int is_main_thread(void) {
+    return getpid() == gettid();
 }
 #else
 int pthread_main_np(void);
@@ -8689,6 +8694,7 @@ static void iowork(void *udata) {
 #endif
 
 static int workfn(int64_t pin, void(*work)(void *udata), void *udata) {
+    (void)pin;
     struct coroutine *co = coself();
     if (!work) {
         return NECO_INVAL;
