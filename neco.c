@@ -1953,14 +1953,6 @@ static struct sco *sco_list_pop_front(struct sco_list *list) {
     return co;
 }
 
-static void sco_list_push_front(struct sco_list *list, struct sco *co) {
-    sco_remove_from_list(co);
-    list->head.next->prev = co;
-    co->next = list->head.next;
-    co->prev = (struct sco*)&list->head;
-    list->head.next = co;
-}
-
 static void sco_list_push_back(struct sco_list *list, struct sco *co) {
     sco_remove_from_list(co);
     list->tail.prev->next = co;
@@ -2008,18 +2000,11 @@ static void sco_entry(void *udata) {
     co->prev = co;
     co->next = co;
     if (sco_cur) {
-#ifdef SCO_QUICKSTART
-        // Add the coroutine that started this one to the front of the runners
-        // list, and then continue to run new coroutine immediately.
-        sco_list_push_front(&sco_runners, sco_cur);
+        // Reschedule the coroutine that started this one immediately after
+        // all running coroutines, but before any yielding coroutines, and
+        // continue running the started coroutine.
+        sco_list_push_back(&sco_runners, sco_cur);
         sco_nrunners++;
-#else
-        // Reschedule the coroutine that started this one
-        sco_list_push_back(&sco_yielders, co);
-        sco_list_push_back(&sco_yielders, sco_cur);
-        sco_nyielders += 2;
-        sco_switch(false, false);
-#endif
     }
     sco_cur = co;
     if (sco_user_entry) {
@@ -2089,7 +2074,7 @@ void sco_resume(int64_t id) {
             co->next = co;
             sco_list_push_back(&sco_yielders, co);
             sco_nyielders++;
-            // sco_yield();
+            sco_yield();
         }
     }
 }
@@ -3685,9 +3670,14 @@ static struct coroutine *evexists(int fd, enum evkind kind) {
 static int is_main_thread(void) {
     return IsGUIThread(false);
 }
-#elif defined(__linux__) || defined(__EMSCRIPTEN__) 
+#elif defined(__linux__)
 static int is_main_thread(void) {
     return getpid() == (pid_t)syscall(SYS_gettid);
+}
+#elif defined(__EMSCRIPTEN__) 
+int gettid(void);
+static int is_main_thread(void) {
+    return getpid() == gettid();
 }
 #else
 int pthread_main_np(void);
@@ -7078,6 +7068,7 @@ struct neco_mutex {
 
 
 static_assert(sizeof(neco_mutex) >= sizeof(struct neco_mutex), "");
+static_assert(_Alignof(neco_mutex) == _Alignof(struct neco_mutex), "");
 
 static int mutex_init(neco_mutex *mutex) {
     struct neco_mutex *mu = (void*)mutex;
@@ -7334,6 +7325,7 @@ struct neco_waitgroup {
 };
 
 static_assert(sizeof(neco_waitgroup) >= sizeof(struct neco_waitgroup), "");
+static_assert(_Alignof(neco_waitgroup) == _Alignof(struct neco_waitgroup), "");
 
 inline
 static int check_waitgroup(struct neco_waitgroup *wg) {
@@ -7481,6 +7473,7 @@ struct neco_cond {
 };
 
 static_assert(sizeof(neco_cond) >= sizeof(struct neco_cond), "");
+static_assert(_Alignof(neco_cond) == _Alignof(struct neco_cond), "");
 
 static int cond_init0(struct neco_cond *cv) {
     memset(cv, 0, sizeof(struct neco_cond));
@@ -8701,6 +8694,7 @@ static void iowork(void *udata) {
 #endif
 
 static int workfn(int64_t pin, void(*work)(void *udata), void *udata) {
+    (void)pin;
     struct coroutine *co = coself();
     if (!work) {
         return NECO_INVAL;

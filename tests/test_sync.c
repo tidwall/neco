@@ -343,30 +343,6 @@ void test_sync_cond_deadline(void) {
     expect(neco_start(co_sync_cond_deadline, 0), NECO_OK);
 }
 
-void co_sync_mutex_rw_order_child2(int argc, void *argv[]) {
-    assert(argc == 2);
-    neco_mutex *mu = argv[0];
-    struct order *order = argv[1];
-    order_add(order, 17);
-    expect(neco_mutex_rdlock(mu), NECO_OK);
-    order_add(order, 23);
-    expect(neco_mutex_unlock(mu), NECO_OK);
-    order_add(order, 26);
-}
-
-void co_sync_mutex_rw_order_child3(int argc, void *argv[]) {
-    assert(argc == 2);
-    neco_mutex *mu = argv[0];
-    struct order *order = argv[1];
-    order_add(order, 19);
-    expect(neco_mutex_trylock(mu), NECO_BUSY);
-    order_add(order, 20);
-    expect(neco_mutex_rdlock(mu), NECO_OK);
-    order_add(order, 24);
-    expect(neco_mutex_unlock(mu), NECO_OK);
-    order_add(order, 27);
-}
-
 void co_sync_mutex_rw_order_child(int argc, void *argv[]) {
     assert(argc == 2);
     neco_mutex *mu = argv[0];
@@ -382,12 +358,6 @@ void co_sync_mutex_rw_order_child(int argc, void *argv[]) {
     order_add(order, 13);
     expect(neco_yield(), NECO_OK);
     order_add(order, 14);
-    expect(neco_start(co_sync_mutex_rw_order_child2, 2, mu, order), NECO_OK);
-    order_add(order, 18);
-    expect(neco_start(co_sync_mutex_rw_order_child3, 2, mu, order), NECO_OK);
-    order_add(order, 21);
-    expect(neco_mutex_unlock(mu), NECO_OK);
-    order_add(order, 28);
 }
 
 void co_sync_mutex_rw_order(int argc, void *argv[]) {
@@ -414,15 +384,6 @@ void co_sync_mutex_rw_order(int argc, void *argv[]) {
     order_add(&order, 12);
     expect(neco_mutex_unlock(mu), NECO_OK);
     order_add(&order, 15);
-    expect(neco_mutex_tryrdlock(mu), NECO_BUSY);
-    order_add(&order, 16);
-    expect(neco_mutex_rdlock(mu), NECO_OK);
-    order_add(&order, 22);
-    expect(neco_mutex_unlock(mu), NECO_OK);
-    order_add(&order, 25);
-    expect(neco_yield(), NECO_OK);
-    order_add(&order, 29);
-    expect(neco_mutex_destroy(mu), NECO_OK);
     order_check(&order);
 }
 

@@ -96,14 +96,14 @@ void co_sched1(int argc, void *argv[]) {
     int *i = argv[1];
     a[(*i)++] = 'B';
     assert(neco_yield() == NECO_OK);
-    a[(*i)++] = 'D';
+    a[(*i)++] = 'F';
 }
 
 void co_sched2(int argc, void *argv[]) {
     assert(argc == 2);
     char *a = argv[0];
     int *i = argv[1];
-    a[(*i)++] = 'E';
+    a[(*i)++] = 'D';
     assert(neco_yield() == NECO_OK);
     a[(*i)++] = 'G';
 }
@@ -116,7 +116,7 @@ void co_sched(int argc, void *argv[]) {
     assert(neco_start(co_sched1, 2, a, i) == NECO_OK);
     a[(*i)++] = 'C';
     assert(neco_start(co_sched2, 2, a, i) == NECO_OK);
-    a[(*i)++] = 'F';
+    a[(*i)++] = 'E';
     assert(neco_yield() == NECO_OK);
     a[(*i)++] = 'H';
 }
