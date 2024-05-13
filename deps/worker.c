@@ -12,6 +12,12 @@
 #include <string.h>
 #include <pthread.h>
 
+#ifdef WORKER_STATIC
+#define WORKER_API static
+#else
+#define WORKER_API
+#endif
+
 #define WORKER_DEF_TIMEOUT INT64_C(1000000000) // one second
 #define WORKER_DEF_MAX_THREADS 2
 #define WORKER_DEF_MAX_THREAD_ENTRIES 32
@@ -46,6 +52,7 @@ struct worker {
     void (*free)(void*);
 };
 
+WORKER_API
 void worker_free(struct worker *worker) {
     if (worker) {
         if (worker->threads) {
@@ -70,6 +77,7 @@ void worker_free(struct worker *worker) {
     }
 }
 
+WORKER_API
 struct worker *worker_new(struct worker_opts *opts) {
     // Load options
     int nthreads = opts ? opts->max_threads : 0;
@@ -164,6 +172,7 @@ static void *worker_entry(void *arg) {
 /// @param udata any user data
 /// @return true for success or false if no worker is available. 
 /// @return false for invalid arguments. Worker and work must no be null.
+WORKER_API
 bool worker_submit(struct worker *worker, int64_t pin, void(*work)(void *udata),
     void *udata)
 {
