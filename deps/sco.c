@@ -1854,11 +1854,11 @@ static void sco_entry(void *udata) {
     co->prev = co;
     co->next = co;
     if (sco_cur) {
-        // Reschedule the coroutine that started this one
-        sco_list_push_back(&sco_yielders, co);
-        sco_list_push_back(&sco_yielders, sco_cur);
-        sco_nyielders += 2;
-        sco_switch(false, false);
+        // Reschedule the coroutine that started this one immediately after
+        // all running coroutines, but before any yielding coroutines, and
+        // continue running the started coroutine.
+        sco_list_push_back(&sco_runners, sco_cur);
+        sco_nrunners++;
     }
     sco_cur = co;
     if (sco_user_entry) {
