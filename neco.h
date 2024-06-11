@@ -97,7 +97,7 @@ int neco_gen_close(neco_gen *gen);
 /// @}
 
 ////////////////////////////////////////////////////////////////////////////////
-// synchonization mechanisms
+// synchronization mechanisms
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @defgroup Mutexes Mutexes
@@ -211,7 +211,7 @@ int neco_dial_dl(const char *network, const char *address, int64_t deadline);
 // cancellation
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @defgroup Cancelation Cancelation
+/// @defgroup Cancellation Cancellation
 /// @{
 
 int neco_cancel(int64_t id);
@@ -267,7 +267,7 @@ int neco_signal_unwatch(int signo);
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @defgroup Worker Background worker
-/// Run arbritary code in a background worker thread
+/// Run arbitrary code in a background worker thread
 /// @{
 
 int neco_work(int64_t pin, void(*work)(void *udata), void *udata);
