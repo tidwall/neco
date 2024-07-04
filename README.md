@@ -48,7 +48,7 @@ concurrency models like async/await.
 
 ## Using
 
-Just drop the "neco.c" and "neco.h" files into your project. Uses standard C11 so most modern C compilers should work.
+Just drop the "neco.c" and "neco.h" files into your project. Most modern C compilers should work.
 
 ```sh
 cc -c neco.c
