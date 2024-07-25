@@ -43,8 +43,10 @@ fi
 if [[ "$CC" == "" ]]; then
     CC=cc
 fi
+UCFLAGS=$CFLAGS
+CFLAGS=
 if [[ "$1" != "bench" ]]; then
-    CFLAGS="-O0 -g3 -Wall -Wextra -fstrict-aliasing $CFLAGS"
+    CFLAGS="-O0 -g2 -Wall -Wextra -fstrict-aliasing $CFLAGS"
     CCVERSHEAD="$($CC --version | head -n 1)"
     if [[ "$CCVERSHEAD" == "" ]]; then
         exit 1
@@ -109,14 +111,15 @@ elif [[ "`uname`" == *"_NT-"* ]]; then
 fi
 
 if [[ "$CC" == *"zig"* ]]; then
-    # Without -O3, 'zig cc' has quirks issues on Mac OS.
-    CFLAGS="$CFLAGS -O3"
     # Stack unwinding is not supported yet
     # https://github.com/ziglang/zig/issues/9046
     CFLAGS="$CFLAGS -DLLCO_NOUNWIND"
+    # Without -O1, 'zig cc' has quirks issues on Mac OS.
+    if [[ "`uname`" == "Darwin" ]]; then
+        CFLAGS="$CFLAGS -O1"
+    fi
 fi
-
-
+CFLAGS="$CFLAGS $UCFLAGS"
 
 CC=${CC:-cc}
 echo "CC: $CC"
