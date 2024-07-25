@@ -19,6 +19,10 @@
 #include <sys/socket.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // basic operations
 ////////////////////////////////////////////////////////////////////////////////
@@ -447,6 +451,10 @@ void __neco_exit_prog(int);
 
 #ifndef EAI_SYSTEM
 #define EAI_SYSTEM 11
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif // NECO_H
