@@ -3253,7 +3253,7 @@ struct cleanup {
     void (*routine)(void *);
     void *arg;
     struct cleanup *next;
-} aligned16;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // colist - The standard queue type that is just a doubly linked list storing
@@ -3265,7 +3265,7 @@ struct coroutine;
 struct colink {
     struct coroutine *prev;
     struct coroutine *next;
-} aligned16;
+};
 
 struct colist {
     struct colink head;
@@ -7077,13 +7077,11 @@ int neco_serve(const char *network, const char *address) {
 ////////////////////////////////////////////////////////////////////////////////
 
 struct neco_mutex {
-    _Alignas(16)         // needed for opaque type alias
     int64_t rtid;        // runtime id
-    bool locked;         // mutex is locked (read or write)
-    int  rlocked;        // read lock counter
     struct colist queue; // coroutine doubly linked list
+    int  rlocked;        // read lock counter
+    bool locked;         // mutex is locked (read or write)
 };
-
 
 static_assert(sizeof(neco_mutex) >= sizeof(struct neco_mutex), "");
 static_assert(_Alignof(neco_mutex) == _Alignof(struct neco_mutex), "");
@@ -7337,10 +7335,9 @@ int neco_mutex_destroy(neco_mutex *mutex) {
 }
 
 struct neco_waitgroup {
-    _Alignas(16)          // needed for opaque type alias
     int64_t rtid;         // runtime id
-    int count;            // current wait count
     struct colist queue;  // coroutine doubly linked list
+    int count;            // current wait count
 };
 
 static_assert(sizeof(neco_waitgroup) >= sizeof(struct neco_waitgroup), "");
@@ -7487,7 +7484,6 @@ int neco_waitgroup_destroy(neco_waitgroup *waitgroup) {
 }
 
 struct neco_cond {
-    _Alignas(16)         // needed for opaque type alias
     int64_t rtid;        // runtime id
     struct colist queue; // coroutine doubly linked list
 };
