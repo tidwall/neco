@@ -14,3 +14,5 @@ tmp.*
 *.testdata
 *.sqlite3
 *.db
+*.elf
+*.dbg

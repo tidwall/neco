@@ -289,6 +289,11 @@ static void llco_exit(void) {
 #error LLCO_ASM must not be defined
 #endif
 
+#if defined(__COSMOCC__) && !defined(LLCO_NOASM)
+// Cosmopolitan has issues with asm code
+#define LLCO_NOASM
+#endif
+
 // Passing the entry function into assembly requires casting the function 
 // pointer to an object pointer, which is forbidden in the ISO C spec but
 // allowed in posix. Ignore the warning attributed to this  requirement when
@@ -1323,7 +1328,7 @@ const char *llco_method(void *caps) {
 }
 
 #if defined(__GNUC__) && !defined(__EMSCRIPTEN__) && !defined(_WIN32) && \
-    !defined(LLCO_NOUNWIND)
+    !defined(LLCO_NOUNWIND) && !defined(__COSMOCC__)
 
 #include <unwind.h>
 #include <string.h>
@@ -1336,8 +1341,7 @@ struct llco_dlinfo {
     void            *dli_saddr;     /* Address of nearest symbol */
 };
 
-
-#if defined(__linux__) && !defined(_GNU_SOURCE) 
+#if defined(__linux__) && !defined(_GNU_SOURCE)
 int dladdr(const void *, void *);
 #endif
 
@@ -2874,7 +2878,7 @@ bool worker_submit(struct worker *worker, int64_t pin, void(*work)(void *udata),
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
 #define NECO_POLL_EPOLL
-#elif defined(__EMSCRIPTEN__) || defined(_WIN32)
+#elif defined(__EMSCRIPTEN__) || defined(_WIN32) || defined(__COSMOCC__)
 // #warning Webassembly has no polling
 #define NECO_POLL_DISABLED
 #else
@@ -3691,7 +3695,7 @@ static int is_main_thread(void) {
 static int is_main_thread(void) {
     return getpid() == (pid_t)syscall(SYS_gettid);
 }
-#elif defined(__EMSCRIPTEN__) 
+#elif defined(__EMSCRIPTEN__) || defined(__COSMOCC__)
 int gettid(void);
 static int is_main_thread(void) {
     return getpid() == gettid();
@@ -4373,7 +4377,6 @@ static int run(void(*coroutine)(int, void**), int nargs, va_list *args,
     pthread_mutex_init(&rt->iomu, 0);
     colist_init(&rt->iolist);
 #endif
-
 
     // Start the main coroutine. Actually, it's just queued to run first.
     ret = start(coroutine, nargs, args, argv, 0, 0);

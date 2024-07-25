@@ -135,6 +135,11 @@ static void llco_exit(void) {
 #error LLCO_ASM must not be defined
 #endif
 
+#if defined(__COSMOCC__) && !defined(LLCO_NOASM)
+// Cosmopolitan has issues with asm code
+#define LLCO_NOASM
+#endif
+
 // Passing the entry function into assembly requires casting the function 
 // pointer to an object pointer, which is forbidden in the ISO C spec but
 // allowed in posix. Ignore the warning attributed to this  requirement when
@@ -1169,7 +1174,7 @@ const char *llco_method(void *caps) {
 }
 
 #if defined(__GNUC__) && !defined(__EMSCRIPTEN__) && !defined(_WIN32) && \
-    !defined(LLCO_NOUNWIND)
+    !defined(LLCO_NOUNWIND) && !defined(__COSMOCC__)
 
 #include <unwind.h>
 #include <string.h>
@@ -1182,8 +1187,7 @@ struct llco_dlinfo {
     void            *dli_saddr;     /* Address of nearest symbol */
 };
 
-
-#if defined(__linux__) && !defined(_GNU_SOURCE) 
+#if defined(__linux__) && !defined(_GNU_SOURCE)
 int dladdr(const void *, void *);
 #endif
 
