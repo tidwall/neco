@@ -54,8 +54,10 @@ if [[ "$1" != "bench" ]]; then
 
     if [[ "$CCVERSHEAD" == *"clang"* ]]; then
         CLANGVERS="$(echo "$CCVERSHEAD" | awk '{print $4}' | awk -F'[ .]+' '{print $1}')"
+        INSTALLDIR="$($CC --version | grep InstalledDir)"
+        INSTALLDIR="${INSTALLDIR#* }" 
     fi
-
+    
     if [[ "$CC" == *"zig"* ]]; then
         # echo Zig does not support asans
         NOSANS=1
@@ -220,19 +222,20 @@ else
     OK=1
     echo "OK"
 
+
     if [[ "$COVREGIONS" == "" ]]; then 
         COVREGIONS="false"
     fi
 
     if [[ "$WITHCOV" == "1" ]]; then
-        $LLVM_PROFDATA merge *.profraw -o test.profdata
-        $LLVM_COV report *.test ../neco.c -ignore-filename-regex=.test. \
+        $INSTALLDIR/$LLVM_PROFDATA merge *.profraw -o test.profdata
+        $INSTALLDIR/$LLVM_COV report *.test ../neco.c -ignore-filename-regex=.test. \
             -j=4 \
             -show-functions=true \
             -instr-profile=test.profdata > /tmp/test.cov.sum.txt
         # echo coverage: $(cat /tmp/test.cov.sum.txt | grep TOTAL | awk '{ print $NF }')
         echo covered: "$(cat /tmp/test.cov.sum.txt | grep TOTAL | awk '{ print $7; }') (lines)"
-        $LLVM_COV show *.test ../neco.c -ignore-filename-regex=.test. \
+        $INSTALLDIR/$LLVM_COV show *.test ../neco.c -ignore-filename-regex=.test. \
             -j=4 \
             -show-regions=true \
             -show-expansions=$COVREGIONS \
