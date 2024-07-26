@@ -6,6 +6,7 @@ set -e
 cd $(dirname "${BASH_SOURCE[0]}")
 
 OK=0
+FAILS=
 finish() { 
     rm -fr *.o
     rm -fr *.out
@@ -16,7 +17,7 @@ finish() {
     rm -fr *.c.worker.js
     rm -fr *.c.wasm
     if [[ "$OK" != "1" ]]; then
-        echo "FAIL"
+        echo "FAIL [`echo "$FAILS" | xargs`]"
     fi
 }
 trap finish EXIT
@@ -210,6 +211,7 @@ else
         if [[ "$WITHCOV" == "1" ]]; then
             export LLVM_PROFILE_FILE="$f.profraw"
         fi
+        set +e
         if [[ "$VALGRIND" == "1" ]]; then
             valgrind --leak-check=yes ./$f.test $@
         elif [[ "$CC" == "emcc" ]]; then
@@ -217,10 +219,15 @@ else
         else
             ./$f.test $@
         fi
-
+        if [[ "$?" != "0" ]]; then
+            FAILS="$FAILS$(echo "$f" | cut -f 1 -d '.') "
+        fi
+        set -e
     done
-    OK=1
-    echo "OK"
+    if [[ "$FAILS" == "" ]]; then
+        OK=1
+        echo "OK"
+    fi
 
 
     if [[ "$COVREGIONS" == "" ]]; then 
